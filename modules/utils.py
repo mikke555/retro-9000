@@ -19,16 +19,26 @@ def read_txt(keys_path, proxy_path):
         logger.warning(f"{keys_path} is empty")
         exit(0)
 
-    if not proxies and settings.USE_PROXY:
+    if settings.USE_PROXY and not proxies:
         logger.warning(f"{proxy_path} is empty")
         exit(0)
 
+    num_keys = len(keys)
+    num_proxies = len(proxies)
+
     if settings.USE_PROXY:
-        keys, proxies = zip(*random.sample(list(zip(keys, proxies)), len(keys)))
-        keys, proxies = list(keys), list(proxies)
+        if num_keys > num_proxies:
+            # Cycle proxies if there are fewer proxies than keys
+            cycles_needed = (num_keys // num_proxies) + 1
+            proxies *= cycles_needed
+            proxies = proxies[:num_keys]
     else:
         proxies = [None] * len(keys)
         logger.warning("Not using proxy")
+
+    if settings.SHUFFLE_WALLETS:
+        keys, proxies = zip(*random.sample(list(zip(keys, proxies)), len(keys)))
+        keys, proxies = list(keys), list(proxies)
 
     return keys, proxies
 
