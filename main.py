@@ -40,7 +40,7 @@ def main():
 
             voting_power = avax.login()
             if not voting_power:
-                return
+                continue
 
             votes_per_project = divide_amounts_evenly(voting_power, len(projects))
 
